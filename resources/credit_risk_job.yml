@@ -14,7 +14,7 @@ resources:
           depends_on:
             - task_key: create_bronze_table
           notebook_task:
-            notebook_path: ${workspace.file_path}/notebooks/02_create_silver_table
+            notebook_path: ${workspace.file_path}/notebooks/02_create_silver_table_v2
             base_parameters:
               catalog_name: ${var.catalog_name}
               schema_name: ${var.schema_name}
@@ -23,7 +23,7 @@ resources:
           depends_on:
             - task_key: create_silver_table
           notebook_task:
-            notebook_path: ${workspace.file_path}/notebooks/02_data_quality_checks
+            notebook_path: ${workspace.file_path}/notebooks/02_data_quality_checks_v2
             base_parameters:
               catalog_name: ${var.catalog_name}
               schema_name: ${var.schema_name}
@@ -86,7 +86,7 @@ resources:
           depends_on:
             - task_key: monitor_drift
           notebook_task:
-            notebook_path: ${workspace.file_path}/notebooks/13_retraining_decision
+            notebook_path: ${workspace.file_path}/notebooks/13_retraining_decision_v2
             base_parameters:
               catalog_name: ${var.catalog_name}
               schema_name: ${var.schema_name}
@@ -113,7 +113,7 @@ resources:
           depends_on:
             - task_key: promote_model
           notebook_task:
-            notebook_path: ${workspace.file_path}/notebooks/08_batch_inference
+            notebook_path: ${workspace.file_path}/notebooks/08_batch_inference_v2
             base_parameters:
               catalog_name: ${var.catalog_name}
               schema_name: ${var.schema_name}
@@ -122,7 +122,7 @@ resources:
           depends_on:
             - task_key: batch_inference
           notebook_task:
-            notebook_path: ${workspace.file_path}/notebooks/09_register_serving_model
+            notebook_path: ${workspace.file_path}/notebooks/09_register_serving_model_v2
             base_parameters:
               catalog_name: ${var.catalog_name}
               schema_name: ${var.schema_name}
