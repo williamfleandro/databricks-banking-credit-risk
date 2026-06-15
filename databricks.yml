@@ -1,0 +1,37 @@
+bundle:
+  name: databricks_banking_credit_risk
+
+variables:
+  catalog_name:
+    default: mlops_dev
+  schema_name:
+    default: banking
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://dbc-710d747d-f005.cloud.databricks.com
+    variables:
+      catalog_name: mlops_dev
+      schema_name: banking
+
+  acc:
+    mode: production
+    workspace:
+      host: https://dbc-710d747d-f005.cloud.databricks.com
+    variables:
+      catalog_name: mlops_acc
+      schema_name: banking
+
+  prod:
+    mode: production
+    workspace:
+      host: https://dbc-710d747d-f005.cloud.databricks.com
+    variables:
+      catalog_name: mlops_production
+      schema_name: banking

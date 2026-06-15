@@ -1,0 +1,37 @@
+name: Databricks Bundle DEV
+
+      on:
+        push:
+  branches: [ main, feature/**, docs/** ]
+pull_request:
+  branches: [ main ]
+workflow_dispatch:
+
+      jobs:
+        bundle-dev:
+          runs-on: ubuntu-latest
+          environment: dev
+          steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Install Databricks CLI
+              uses: databricks/setup-cli@main
+
+            - name: Validate
+              env:
+                DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+                DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+              run: databricks bundle validate -t dev
+
+            - name: Deploy
+              env:
+                DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+                DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+              run: databricks bundle deploy -t dev
+
+            - name: Run workflow
+              env:
+                DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+                DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+              run: databricks bundle run credit_risk_mlops_pipeline -t dev
