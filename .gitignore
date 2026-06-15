@@ -8,3 +8,17 @@ data/raw/*
 logs/
 *.log
 *.zip
+
+# Local environment
+.env
+.venv/
+__pycache__/
+*.pyc
+
+# Local datasets
+data/raw/*.csv
+data/raw/*.zip
+data/raw/*.parquet
+
+# Databricks local files
+.databricks/

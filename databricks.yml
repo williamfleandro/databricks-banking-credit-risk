@@ -26,6 +26,7 @@ targets:
     mode: production
     workspace:
       host: https://dbc-710d747d-f005.cloud.databricks.com
+      root_path: /Workspace/Users/williamfleandro@gmail.com/.bundle/${bundle.name}/${bundle.target}
     variables:
       catalog_name: mlops_acc
       schema_name: banking
@@ -34,6 +35,7 @@ targets:
     mode: production
     workspace:
       host: https://dbc-710d747d-f005.cloud.databricks.com
+      root_path: /Workspace/Users/williamfleandro@gmail.com/.bundle/${bundle.name}/${bundle.target}
     variables:
       catalog_name: mlops_production
       schema_name: banking
