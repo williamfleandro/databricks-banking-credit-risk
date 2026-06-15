@@ -1,35 +1,38 @@
 name: Databricks Bundle ACC
 
-      on:
-        push:
-  branches: [ main ]
-workflow_dispatch:
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
-      jobs:
-        bundle-acc:
-          runs-on: ubuntu-latest
-          environment: acc
-          steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+jobs:
+  bundle-acc:
+    runs-on: ubuntu-latest
+    environment: acc
 
-            - name: Install Databricks CLI
-              uses: databricks/setup-cli@main
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-            - name: Validate
-              env:
-                DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-                DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-              run: databricks bundle validate -t acc
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
 
-            - name: Deploy
-              env:
-                DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-                DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-              run: databricks bundle deploy -t acc
+      - name: Validate
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: databricks bundle validate -t acc
 
-            - name: Run workflow
-              env:
-                DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-                DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-              run: databricks bundle run credit_risk_mlops_pipeline -t acc
+      - name: Deploy
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: databricks bundle deploy -t acc
+
+      - name: Run workflow
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: databricks bundle run credit_risk_mlops_pipeline -t acc
+        
