@@ -3,8 +3,10 @@ bundle:
 
 variables:
   catalog_name:
+    description: Unity Catalog catalog
     default: mlops_dev
   schema_name:
+    description: Unity Catalog schema
     default: banking
 
 include:

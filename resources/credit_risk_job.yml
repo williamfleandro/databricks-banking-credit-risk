@@ -3,145 +3,144 @@ resources:
     credit_risk_mlops_pipeline:
       name: credit-risk-mlops-pipeline-${bundle.target}
       tasks:
-
-        - task_key: 01_create_bronze_table
+        - task_key: create_bronze_table
           notebook_task:
             notebook_path: ${workspace.file_path}/notebooks/01_create_bronze_table
             base_parameters:
               catalog_name: ${var.catalog_name}
               schema_name: ${var.schema_name}
 
-        - task_key: 02_create_silver_table
+        - task_key: create_silver_table
           depends_on:
-            - task_key: 01_create_bronze_table
+            - task_key: create_bronze_table
           notebook_task:
             notebook_path: ${workspace.file_path}/notebooks/02_create_silver_table
             base_parameters:
               catalog_name: ${var.catalog_name}
               schema_name: ${var.schema_name}
 
-        - task_key: 02_data_quality_checks
+        - task_key: data_quality_checks
           depends_on:
-            - task_key: 02_create_silver_table
+            - task_key: create_silver_table
           notebook_task:
             notebook_path: ${workspace.file_path}/notebooks/02_data_quality_checks
             base_parameters:
               catalog_name: ${var.catalog_name}
               schema_name: ${var.schema_name}
 
-        - task_key: 03_create_gold_table
+        - task_key: create_gold_table
           depends_on:
-            - task_key: 02_data_quality_checks
+            - task_key: data_quality_checks
           notebook_task:
             notebook_path: ${workspace.file_path}/notebooks/03_create_gold_table
             base_parameters:
               catalog_name: ${var.catalog_name}
               schema_name: ${var.schema_name}
 
-        - task_key: 04_create_feature_table
+        - task_key: create_feature_table
           depends_on:
-            - task_key: 03_create_gold_table
+            - task_key: create_gold_table
           notebook_task:
             notebook_path: ${workspace.file_path}/notebooks/04_create_feature_table
             base_parameters:
               catalog_name: ${var.catalog_name}
               schema_name: ${var.schema_name}
 
-        - task_key: 04_register_feature_table_uc
+        - task_key: register_feature_table_uc
           depends_on:
-            - task_key: 04_create_feature_table
+            - task_key: create_feature_table
           notebook_task:
             notebook_path: ${workspace.file_path}/notebooks/04_register_feature_table_uc
             base_parameters:
               catalog_name: ${var.catalog_name}
               schema_name: ${var.schema_name}
 
-        - task_key: 05_train_models_pipeline
+        - task_key: train_models
           depends_on:
-            - task_key: 04_register_feature_table_uc
+            - task_key: register_feature_table_uc
           notebook_task:
             notebook_path: ${workspace.file_path}/notebooks/05_train_models_pipeline
             base_parameters:
               catalog_name: ${var.catalog_name}
               schema_name: ${var.schema_name}
 
-        - task_key: 06_evaluate_best_model
+        - task_key: evaluate_best_model
           depends_on:
-            - task_key: 05_train_models_pipeline
+            - task_key: train_models
           notebook_task:
             notebook_path: ${workspace.file_path}/notebooks/06_evaluate_best_model
             base_parameters:
               catalog_name: ${var.catalog_name}
               schema_name: ${var.schema_name}
 
-        - task_key: 07_promote_model
+        - task_key: monitor_drift
           depends_on:
-            - task_key: 06_evaluate_best_model
-          notebook_task:
-            notebook_path: ${workspace.file_path}/notebooks/07_promote_model
-            base_parameters:
-              catalog_name: ${var.catalog_name}
-              schema_name: ${var.schema_name}
-
-        - task_key: 08_batch_inference
-          depends_on:
-            - task_key: 07_promote_model
-          notebook_task:
-            notebook_path: ${workspace.file_path}/notebooks/08_batch_inference
-            base_parameters:
-              catalog_name: ${var.catalog_name}
-              schema_name: ${var.schema_name}
-
-        - task_key: 09_register_serving_model
-          depends_on:
-            - task_key: 08_batch_inference
-          notebook_task:
-            notebook_path: ${workspace.file_path}/notebooks/09_register_serving_model
-            base_parameters:
-              catalog_name: ${var.catalog_name}
-              schema_name: ${var.schema_name}
-
-        - task_key: 10_monitor_drift
-          depends_on:
-            - task_key: 09_register_serving_model
+            - task_key: evaluate_best_model
           notebook_task:
             notebook_path: ${workspace.file_path}/notebooks/10_monitor_drift
             base_parameters:
               catalog_name: ${var.catalog_name}
               schema_name: ${var.schema_name}
 
-        - task_key: 10_drift_approval_gate
+        - task_key: retraining_decision
           depends_on:
-            - task_key: 10_monitor_drift
+            - task_key: monitor_drift
+          notebook_task:
+            notebook_path: ${workspace.file_path}/notebooks/13_retraining_decision
+            base_parameters:
+              catalog_name: ${var.catalog_name}
+              schema_name: ${var.schema_name}
+
+        - task_key: drift_approval_gate
+          depends_on:
+            - task_key: retraining_decision
           notebook_task:
             notebook_path: ${workspace.file_path}/notebooks/10_drift_approval_gate
             base_parameters:
               catalog_name: ${var.catalog_name}
               schema_name: ${var.schema_name}
 
-        - task_key: 11_compare_champion_challenger
+        - task_key: promote_model
           depends_on:
-            - task_key: 10_drift_approval_gate
+            - task_key: drift_approval_gate
+          notebook_task:
+            notebook_path: ${workspace.file_path}/notebooks/07_promote_model
+            base_parameters:
+              catalog_name: ${var.catalog_name}
+              schema_name: ${var.schema_name}
+
+        - task_key: batch_inference
+          depends_on:
+            - task_key: promote_model
+          notebook_task:
+            notebook_path: ${workspace.file_path}/notebooks/08_batch_inference
+            base_parameters:
+              catalog_name: ${var.catalog_name}
+              schema_name: ${var.schema_name}
+
+        - task_key: register_serving_model
+          depends_on:
+            - task_key: batch_inference
+          notebook_task:
+            notebook_path: ${workspace.file_path}/notebooks/09_register_serving_model
+            base_parameters:
+              catalog_name: ${var.catalog_name}
+              schema_name: ${var.schema_name}
+
+        - task_key: compare_champion_challenger
+          depends_on:
+            - task_key: register_serving_model
           notebook_task:
             notebook_path: ${workspace.file_path}/notebooks/11_compare_champion_challenger
             base_parameters:
               catalog_name: ${var.catalog_name}
               schema_name: ${var.schema_name}
 
-        - task_key: 12_auto_rollback
+        - task_key: auto_rollback
           depends_on:
-            - task_key: 11_compare_champion_challenger
+            - task_key: compare_champion_challenger
           notebook_task:
             notebook_path: ${workspace.file_path}/notebooks/12_auto_rollback
-            base_parameters:
-              catalog_name: ${var.catalog_name}
-              schema_name: ${var.schema_name}
-
-        - task_key: 13_retraining_decision
-          depends_on:
-            - task_key: 12_auto_rollback
-          notebook_task:
-            notebook_path: ${workspace.file_path}/notebooks/13_retraining_decision
             base_parameters:
               catalog_name: ${var.catalog_name}
               schema_name: ${var.schema_name}

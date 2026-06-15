@@ -1,10 +1,10 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # 06 Evaluate Best Model
-# MAGIC
-# MAGIC Projeto: Databricks Banking — Credit Risk / Loan Default
+# MAGIC # 06 - Evaluate Best Model
 
 # COMMAND ----------
+
+from pyspark.sql import functions as F
 
 dbutils.widgets.text("catalog_name", "mlops_dev")
 dbutils.widgets.text("schema_name", "banking")
@@ -12,12 +12,27 @@ dbutils.widgets.text("schema_name", "banking")
 CATALOG_NAME = dbutils.widgets.get("catalog_name")
 SCHEMA_NAME = dbutils.widgets.get("schema_name")
 
-DOMAIN = "credit_risk"
-TARGET_COLUMN = "loan_status"
-RAW_FILE = "credit_risk_dataset.csv"
+MODEL_COMPARISON_TABLE = f"{CATALOG_NAME}.{SCHEMA_NAME}.credit_risk_model_comparison"
+BEST_MODEL_TABLE = f"{CATALOG_NAME}.{SCHEMA_NAME}.credit_risk_best_model"
 
-print(f"Catalog: {CATALOG_NAME}")
-print(f"Schema: {SCHEMA_NAME}")
-print(f"Domain: {DOMAIN}")
-print(f"Target: {TARGET_COLUMN}")
-print("TODO: implementar este notebook seguindo o padrão do projeto Databricks MLOps Churn Lab.")
+df = spark.table(MODEL_COMPARISON_TABLE)
+
+best_df = (
+    df.filter(F.col("is_best_model") == True)
+    .orderBy(F.col("created_at").desc())
+    .limit(1)
+)
+
+if best_df.count() == 0:
+    raise Exception("No best model found.")
+
+(
+    best_df.write
+    .mode("overwrite")
+    .option("overwriteSchema", "true")
+    .saveAsTable(BEST_MODEL_TABLE)
+)
+
+display(best_df)
+row = best_df.collect()[0]
+dbutils.notebook.exit(f"BEST_MODEL_EVALUATED: {row['model_type']}")

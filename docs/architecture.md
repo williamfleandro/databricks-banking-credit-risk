@@ -1,3 +1,5 @@
-# Arquitetura — Credit Risk / Loan Default
+# Arquitetura — Databricks Banking Credit Risk
 
-Em construção.
+```text
+Kaggle → Unity Catalog Volume → Bronze → Silver → Data Quality → Gold → Feature Table UC → MLflow → Registry → Serving → Monitoring
+```
